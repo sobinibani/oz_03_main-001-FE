@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { create } from 'zustand';
 
 type DishData = {
@@ -18,7 +19,9 @@ type pickedDish = {
 
 type Box = {
   id: number;
+  name: string;
   pickedDishList: pickedDish[];
+  quantity: number;
   boxPrice: number;
 };
 
@@ -27,17 +30,19 @@ type Store = {
   currentCategory: string;
   toggleAllergy: () => void;
   setCurrentCategory: (current: string) => void;
-  dishList: DishData[];
-  setDishList: (dishList: DishData[]) => void;
   basket: Box[];
   createBox: () => void;
   addToPickedDishList: (boxId: number, dishData: DishData) => void;
   currentBoxId: number;
   setCurrentBoxId: (current: number) => void;
+  setBoxName: (boxId: number, name: string) => void;
   removePickedDish: (boxId: number, uniqueId: number) => void;
   removeBox: (boxId: number) => void;
   currentPost: DishData[];
   setCurrentPost: (currentPost: DishData[]) => void;
+  totalPrice: number;
+  setTotalPrice: (totalPrice: number) => void;
+  setBoxQuantity: (boxId: number, quantity: number) => void;
 };
 
 const useOrderStore = create<Store>()((set) => ({
@@ -46,15 +51,20 @@ const useOrderStore = create<Store>()((set) => ({
   toggleAllergy: () =>
     set((state) => ({ isAllergyChecked: !state.isAllergyChecked })),
   setCurrentCategory: (current) => set({ currentCategory: current }),
-  dishList: [],
-  setDishList: (dishList) => set({ dishList }),
-  basket: [{ id: 1, pickedDishList: [], boxPrice: 0 }],
+  basket: [
+    { id: 1, name: '도시락', pickedDishList: [], quantity: 1, boxPrice: 0 },
+  ],
   createBox: () =>
     set((state) => ({
       basket: [
         ...state.basket,
-        // { id: state.basket.length + 1, pickedDishList: [] },
-        { id: Date.now(), pickedDishList: [], boxPrice: 0 },
+        {
+          id: Date.now(),
+          name: '도시락',
+          pickedDishList: [],
+          quantity: 1,
+          boxPrice: 0,
+        },
       ],
     })),
   addToPickedDishList: (boxId, dishData) =>
@@ -73,6 +83,12 @@ const useOrderStore = create<Store>()((set) => ({
     })),
   currentBoxId: 1,
   setCurrentBoxId: (current) => set({ currentBoxId: current }),
+  setBoxName: (boxId, name) =>
+    set((state) => ({
+      basket: state.basket.map((box) =>
+        box.id === boxId ? { ...box, name: name } : box
+      ),
+    })),
   removePickedDish: (boxId, id) =>
     set((state) => ({
       basket: state.basket.map((box) =>
@@ -92,6 +108,14 @@ const useOrderStore = create<Store>()((set) => ({
     })),
   currentPost: [],
   setCurrentPost: (currentPost) => set({ currentPost }),
+  totalPrice: 0,
+  setTotalPrice: (totalPrice) => set({ totalPrice }),
+  setBoxQuantity: (boxId, quantity) =>
+    set((state) => ({
+      basket: state.basket.map((box) =>
+        box.id === boxId ? { ...box, quantity: quantity } : box
+      ),
+    })),
 }));
 
 export default useOrderStore;
