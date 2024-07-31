@@ -11,24 +11,8 @@ const Header = () => {
   const orderPaths: string[] = ['/order', '/orderDetail', '/orderHistory'];
   const CommunityPaths: string[] = ['/community'];
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const handleClickOutside = (e: MouseEvent) => {
-    const target = e.target as Node;
-    if (dropdownRef.current && !dropdownRef.current.contains(target)) {
-      setIsDropdownOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  //
+  const [isLogin, setIsLogin] = useState<boolean>(false);
 
   return (
     <>
@@ -36,7 +20,7 @@ const Header = () => {
 
       <header className='sticky left-0 right-0 top-0 z-50 bg-white'>
         <div className='inner mx-auto flex h-[75px] w-[95%] items-center justify-between headerBreak:w-[1775px]'>
-          <div className='flex items-center'>
+          <div className='menus flex items-center'>
             <h1>
               <Link to='/'>
                 <img
@@ -59,30 +43,59 @@ const Header = () => {
               커뮤니티
             </Link>
           </div>
-          {/* 비로그인 시 */}
-          {/* <button className='h-[38px] w-[85px] rounded-full bg-border font-medium hover:bg-gray20'>
-            <Link to='/login'>로그인</Link>
-          </button> */}
 
-          {/* 로그인 시 */}
-          <div className='relative' ref={dropdownRef}>
-            <button
-              className='flex h-[38px] items-center rounded-full bg-white px-[20px] font-medium hover:bg-background'
-              onClick={() => {
-                setIsDropdownOpen(!isDropdownOpen);
-              }}
-            >
-              <span className='mr-[10px]'>
-                <span className='userName font-semibold'>홍길동</span> 님
-              </span>
-              {isDropdownOpen ? <IoChevronUp /> : <IoChevronDown />}
-            </button>
-            {isDropdownOpen && <UserMenu />}
-          </div>
+          {isLogin ? <UserBtn /> : <LoginBtn />}
         </div>
       </header>
       <div></div>
     </>
+  );
+};
+
+const LoginBtn = () => {
+  return (
+    <button className='h-[38px] w-[85px] rounded-full bg-border font-medium hover:bg-gray20'>
+      <Link to='/login'>로그인</Link>
+    </button>
+  );
+};
+
+const UserBtn = () => {
+  // 로그인 - 유저 드롭모달
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as Node;
+    if (dropdownRef.current && !dropdownRef.current.contains(target)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className='relative' ref={dropdownRef}>
+      <button
+        className='flex h-[38px] items-center rounded-full bg-white px-[20px] font-medium hover:bg-background'
+        onClick={() => {
+          setIsDropdownOpen(!isDropdownOpen);
+        }}
+      >
+        <span className='mr-[10px]'>
+          <span className='userName font-semibold'>홍길동</span> 님
+        </span>
+        {isDropdownOpen ? <IoChevronUp /> : <IoChevronDown />}
+      </button>
+      {isDropdownOpen && <UserMenu />}
+    </div>
   );
 };
 
@@ -110,9 +123,9 @@ const UserMenu = () => {
           aria-hidden
           className='absolute left-[20px] top-1/2 -translate-y-1/2'
         />
-        <Link to='' className='w-[160px] pl-[50px] text-[15px] leading-[50px]'>
+        <button className='flex w-[160px] pl-[50px] text-[15px] leading-[50px]'>
           로그아웃
-        </Link>
+        </button>
       </li>
     </ul>
   );
